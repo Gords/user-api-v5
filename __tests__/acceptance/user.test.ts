@@ -94,7 +94,7 @@ it('should get a user by id', async () => {
 it('should update a user', async () => {
     const response = await request(app).put(`/users/${userId}`)
     .set('Authorization', `Bearer ${authToken}`)
-    .send({...testUser, name: 'Jane Doe'})
+    .send({...initialUser, name: 'Jane Doe'})
     expect(response.statusCode).toBe(200)
     expect(response.body.name).toEqual('Jane Doe')
     expect(response.body.email).toEqual(initialUser.email)
