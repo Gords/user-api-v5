@@ -1,6 +1,9 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
 import { User } from "../entity/User"
+import { hash, compare } from "bcrypt"
+
+const rounds = 8
 
 export class UserController {
 
@@ -11,8 +14,7 @@ export class UserController {
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
-
+        const id = request.params.id
 
         const user = await this.userRepository.findOne({
             where: { id }
@@ -25,19 +27,59 @@ export class UserController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { firstName, lastName, age } = request.body;
+        const { name, email, password } = request.body;
 
         const user = Object.assign(new User(), {
-            firstName,
-            lastName,
-            age
+            name,
+            email,
+            password: await hash(password, rounds)
         })
 
         return this.userRepository.save(user)
     }
 
+    async update(request: Request, response: Response, next: NextFunction) {
+        const id = request.params.id
+        const { name, email, password } = request.body
+
+        let userToUpdate = await this.userRepository.findOne({
+            where: { id }
+        })
+
+        if (!userToUpdate) {
+            throw Error("user does not exist")
+        }
+
+        userToUpdate.name = name
+        userToUpdate.email = email
+        userToUpdate.password = password ? await hash(password, 8) : userToUpdate.password
+
+        await this.userRepository.save(userToUpdate)
+
+        return userToUpdate
+    }
+
+    async login(request: Request, response: Response, next: NextFunction) {
+        const { email, password } = request.body
+
+        const user = await this.userRepository.findOne({
+            where: { email }
+        })
+
+        if (!user) {
+            throw Error("user does not exist")
+        }
+        const isMatch = await compare(password, user.password)
+        
+        if (!isMatch) {
+            throw Error("invalid password")
+        }
+
+        return user
+    }
+
     async remove(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+        const id = request.params.id
 
         let userToRemove = await this.userRepository.findOneBy({ id })
 

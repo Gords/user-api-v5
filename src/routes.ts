@@ -13,7 +13,7 @@ export const Routes = [{
     controller: UserController,
     action: "one",
     validation: [
-        param('id').isInt(),
+        param('id').isUUID(),
     ],
 }, {
     method: "post",
@@ -21,11 +21,48 @@ export const Routes = [{
     controller: UserController,
     action: "save",
     validation:[
-        body('firstName').isString(),
-        body('lastName').isString(),
-        body('age').isInt({min:0}).withMessage("age must be a positive integer")
+        body('name').isString(),
+        body('email').isString(),
+        body('email').isEmail(),
+        body('password').isString().isLength({min: 4}),
     ]
-}, {
+},
+{
+    method: "post",
+    route: "/users/login",
+    controller: UserController,
+    action: "login",
+    validation: [
+        body('email').isString(),
+        body('email').isEmail(),
+        body('password').isString().isLength({min: 4}),
+    ]
+},
+{
+    method: "put",
+    route: "/users/:id",
+    controller: UserController,
+    action: "update",
+    validation: [
+        body('name').isString(),
+        body('email').isString(),
+        body('email').isEmail(),
+        body('password').isString().isLength({min: 4}),
+    ],
+},
+{
+    method: "patch",
+    route: "/users/:id",
+    controller: UserController,
+    action: "update",
+    validation: [
+        body('name').isString(),
+        body('email').isString(),
+        body('email').isEmail(),
+        body('password').isString().isLength({min: 4}),
+    ],
+},
+{
     method: "delete",
     route: "/users/:id",
     controller: UserController,
