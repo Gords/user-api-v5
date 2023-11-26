@@ -49,13 +49,13 @@ Authenticate a user and receive a JWT.
 Retrieve a list of all users (needs the JWT token to be send as a Bearer Token).
 
 ### GET `/users/:uuid`
-Fetch details of a specific user (needs the JWT token to be send as a Bearer Token)..
+Fetch details of a specific user (needs the JWT token to be send as a Bearer Token).
 
 ### PUT `/users/:uuid`
-Update a user's information (needs the JWT token to be send as a Bearer Token)..
+Update a user's information (needs the JWT token to be send as a Bearer Token).
 
 ### DELETE `/users/:uuid`
-Remove a user from the system (needs the JWT token to be send as a Bearer Token)..
+Remove a user from the system (needs the JWT token to be send as a Bearer Token).
 
 ## Technical Stack
 - **Node.js & Express**: For backend development.
