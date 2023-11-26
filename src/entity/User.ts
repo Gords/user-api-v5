@@ -22,8 +22,8 @@ export class User {
     @Column()
     password: string;
 
-    @Column("text", { array: true, default: []})
-    tokens: string[];
+    @Column({default:''})
+    token: string;
 
 
     // Validate password

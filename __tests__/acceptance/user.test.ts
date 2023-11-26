@@ -1,7 +1,7 @@
 import { AppDataSource } from "../../src/data-source";
 import * as request from "supertest";
 import app from "../../src/app";
-import { port } from "../../src/config";
+import 'dotenv/config'
 
 let connection, server;
 
@@ -14,7 +14,7 @@ const testUser = {
 beforeEach(async () => {
     connection = await AppDataSource.initialize()
     await connection.synchronize(true)
-    server = app.listen(port)
+    server = app.listen(process.env.PORT || 3000)
 })
 
 afterEach(() => {

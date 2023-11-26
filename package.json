@@ -29,9 +29,10 @@
       "typeorm": "0.3.17"
    },
    "scripts": {
-      "start": "ts-node src/index.ts",
+      "start": "node dist/src/index.js",
       "typeorm": "typeorm-ts-node-commonjs",
       "dev": "nodemon -w *.ts  -w .env src/index.ts",
-      "test": "jest"
+      "test": "jest",
+      "build": "tsc"
    }
 }

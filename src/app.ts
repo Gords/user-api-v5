@@ -5,6 +5,7 @@ import * as morgan from "morgan"
 import { Routes } from "./routes"
 import { validationResult } from "express-validator"
 
+
 const handleError = (error: Error, req: Request, res: Response, next: Function) => {
     res.status(500).send({ message: error.message })
 }
@@ -16,8 +17,10 @@ app.use(bodyParser.json())
 
 // register express routes from defined application routes
 Routes.forEach(route => {
+    const middlewares = route.middleware ? [...route.middleware, ...route.validation] : route.validation;
+
     (app as any)[route.method](route.route,
-        ...route.validation,
+        ...middlewares,
         async (req: Request, res: Response, next: Function) => {
             try {
                 const errors = validationResult(req)
@@ -25,7 +28,9 @@ Routes.forEach(route => {
                     return res.status(400).json({ errors: errors.array() });
                 }
                 const result = await (new (route.controller as any))[route.action](req, res, next)
-                res.json(result)
+                if (result !== null && result !== undefined) {
+                    res.json(result)
+                }
             } catch (error) {
                 next(error)
             }
@@ -35,4 +40,5 @@ Routes.forEach(route => {
 app.use(handleError)
 
 export default app
+
 

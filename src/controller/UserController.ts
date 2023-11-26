@@ -81,7 +81,7 @@ export class UserController {
             { expiresIn: '1h' }                     // Token expiration
         );
 
-        user.tokens.push(accessToken);
+        user.token = accessToken;
         await this.userRepository.save(user);
 
         return { accessToken, user: { id: user.id, name: user.name, email: user.email } };

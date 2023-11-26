@@ -1,6 +1,8 @@
 import { AppDataSource } from "./data-source"
-import {port} from "./config"
 import app from "./app"
+import 'dotenv/config'
+
+const port = process.env.PORT || 3000
 
 
 AppDataSource.initialize().then(async () => {

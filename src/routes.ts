@@ -1,5 +1,6 @@
 import { param, body } from "express-validator"
 import { UserController } from "./controller/UserController"
+import authenticateToken from "./middleware/auth"
 
 export const Routes = [{
     method: "get",
@@ -7,6 +8,7 @@ export const Routes = [{
     controller: UserController,
     action: "all",
     validation: [],
+    middleware: [authenticateToken]
 }, {
     method: "get",
     route: "/users/:id",
@@ -15,6 +17,7 @@ export const Routes = [{
     validation: [
         param('id').isUUID(),
     ],
+    middleware: [authenticateToken]
 }, {
     method: "post",
     route: "/users",
@@ -49,6 +52,7 @@ export const Routes = [{
         body('email').isEmail(),
         body('password').isString().isLength({min: 4}),
     ],
+    middleware: [authenticateToken]
 },
 {
     method: "patch",
@@ -61,6 +65,7 @@ export const Routes = [{
         body('email').isEmail(),
         body('password').isString().isLength({min: 4}),
     ],
+    middleware: [authenticateToken]
 },
 {
     method: "delete",
@@ -70,4 +75,5 @@ export const Routes = [{
     validation: [
         param('id').isInt(),
     ],
+    middleware: [authenticateToken]
 }]
