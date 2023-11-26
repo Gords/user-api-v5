@@ -1,9 +1,7 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
 import { User } from "../entity/User"
-import { hash, compare } from "bcrypt"
 
-const rounds = 8
 
 export class UserController {
 
@@ -32,7 +30,7 @@ export class UserController {
         const user = Object.assign(new User(), {
             name,
             email,
-            password: await hash(password, rounds)
+            password,
         })
 
         return this.userRepository.save(user)
@@ -52,7 +50,7 @@ export class UserController {
 
         userToUpdate.name = name
         userToUpdate.email = email
-        userToUpdate.password = password ? await hash(password, 8) : userToUpdate.password
+        userToUpdate.password = password
 
         await this.userRepository.save(userToUpdate)
 
@@ -67,15 +65,15 @@ export class UserController {
         })
 
         if (!user) {
-            throw Error("user does not exist")
+            throw Error("Invalid email or password")
         }
-        const isMatch = await compare(password, user.password)
-        
+        const isMatch = await User.comparePasswords(password, user.password)
+
         if (!isMatch) {
-            throw Error("invalid password")
+            throw Error("Invalid email or password")
         }
 
-        return user
+        return user;
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
