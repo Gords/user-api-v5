@@ -1,4 +1,4 @@
-# User API v5
+# User API
 
 ## Overview
 User API v5 is a Node.js RESTful API designed to manage user data. It allows clients to perform  CRUD operations and authentication.
