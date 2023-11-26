@@ -58,6 +58,7 @@ Update a user's information (needs the JWT token to be send as a Bearer Token).
 Remove a user from the system (needs the JWT token to be send as a Bearer Token).
 
 ## Technical Stack
+- **TypeScript**: For type-safe JavaScript development.
 - **Node.js & Express**: For backend development.
 - **TypeORM**: As an ORM tool for database interaction.
 - **PostgreSQL**: As the database.
@@ -65,8 +66,8 @@ Remove a user from the system (needs the JWT token to be send as a Bearer Token)
 - **Jest**: For testing.
 - **Morgan**: For HTTP request logging.
 - **Nodemon**: For automatic server restarts during development.
-- **TypeScript**: For type-safe JavaScript development.
 - **Docker**: For containerization and deployment of the database.
+- **Bcrypt**: For secure password hashing and storage.
 
 ## Testing
 
