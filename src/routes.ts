@@ -73,7 +73,7 @@ export const Routes = [{
     controller: UserController,
     action: "remove",
     validation: [
-        param('id').isInt(),
+        param('id').isUUID(),
     ],
     middleware: [authenticateToken]
 }]

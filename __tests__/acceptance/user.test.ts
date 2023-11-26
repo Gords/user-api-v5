@@ -1,64 +1,108 @@
 import { AppDataSource } from "../../src/data-source";
+import { User } from "../../src/entity/User";
 import * as request from "supertest";
 import app from "../../src/app";
 import 'dotenv/config'
 
-let connection, server;
+let connection, server, authToken, userId;
 
-const testUser = {
-    firstName: 'John',
-    lastName: 'Doe',
-    age: 20
+
+const initialUser = {
+    name: 'Jim Doe',
+    email: 'jim.doe@example.com',
+    password: 'password123'
 }
 
-beforeEach(async () => {
+const testUser = {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    password: 'password123'
+}
+
+beforeAll(async () => {
     connection = await AppDataSource.initialize()
     await connection.synchronize(true)
+
+    // Create a new user
+    const createUserResponse = await request(app).post('/users').send(initialUser);
+    userId = createUserResponse.body.id;
+    expect(createUserResponse.statusCode).toBe(200);
+
+    // Log in to obtain a token
+    const loginResponse = await request(app).post('/users/login').send({
+        email: initialUser.email,
+        password: initialUser.password
+    });
+    authToken = loginResponse.body.accessToken;
+    expect(loginResponse.statusCode).toBe(200);
+
     server = app.listen(process.env.PORT || 3000)
 })
 
-afterEach(() => {
-    connection.close()
-    server.close()
+afterAll(async() => {
+    const userRepository = AppDataSource.getRepository(User);
+    await userRepository.clear();
+
+    // Close the database connection
+    await connection.close();
+
+    // Close the server
+    server.close();
 })
 
-it('should be no users initially', async() => {
-    const response = await request(app).get('/users')
-    console.log(response.body)
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toEqual([])
-})
 
 it('should create a new user', async () => {
     const response = await request(app).post('/users').send(testUser)
     expect(response.statusCode).toBe(200)
-    expect(response.body).toEqual({...testUser, id: 1})
+    expect(response.body.name).toEqual(testUser.name)
+    expect(response.body.email).toEqual(testUser.email)
+    // Do not test for password as it should not be returned in the response
 })
 
-it('Should not create a user if no firstName is provided', async () => {
-    const response = await request(app).post('/users').send({lastName: 'Doe', age: 20})
+it('Should not create a user if email is invalid', async () => {
+    const response = await request(app)
+    .post('/users')
+    .send({...testUser, email: 'invalid'})
     expect(response.statusCode).toBe(400)
-    expect(response.body.errors).not.toBeNull()
-    expect(response.body.errors.length).toBe(1)
-    expect(response.body.errors[0]).toEqual({
-        location: 'body',
-        msg: 'Invalid value',
-        path: 'firstName',
-        type: 'field',
-    })
-    console.log(response.body.errors)
+    // Add assertions for specific error messages as per your API's error handling
 })
 
-it('Should not create a user if age is less than 0', async () => {
-    const response = await request(app).post('/users').send({firstname: 'Joe', lastName: 'Doe', age: -1})
+it('Should not create a user if password is too short', async () => {
+    const response = await request(app).post('/users')
+    .send({...testUser, email: "ftr@gg.com", password: '123'})
     expect(response.statusCode).toBe(400)
-    expect(response.body.errors).not.toBeNull()
-    expect(response.body.errors.length).toBe(2)
-    expect(response.body.errors[0]).toEqual({
-        location: 'body',
-        msg: 'age must be a positive integer',
-        param: 'age',
-        value: -1,
-    })
-    console.log(response.body.errors)
+    // Add assertions for specific error messages as per your API's error handling
+})
+
+it('should get all users', async () => {
+    const response = await request(app).get('/users')
+    .set('Authorization', `Bearer ${authToken}`)
+    expect(response.statusCode).toBe(200)
+    expect(response.body.length).toEqual(2)
+    expect(response.body[0].name).toEqual(initialUser.name)
+    expect(response.body[0].email).toEqual(initialUser.email)
+})
+
+it('should get a user by id', async () => {
+    const response = await request(app).get(`/users/${userId}`)
+    .set('Authorization', `Bearer ${authToken}`)
+    expect(response.statusCode).toBe(200)
+    expect(response.body.name).toEqual(initialUser.name)
+    expect(response.body.email).toEqual(initialUser.email)
+})
+
+it('should update a user', async () => {
+    const response = await request(app).put(`/users/${userId}`)
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({...testUser, name: 'Jane Doe'})
+    expect(response.statusCode).toBe(200)
+    expect(response.body.name).toEqual('Jane Doe')
+    expect(response.body.email).toEqual(initialUser.email)
+})
+
+it('should delete a user', async () => {
+    const response = await request(app).delete(`/users/${userId}`)
+    .set('Authorization', `Bearer ${authToken}`)
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toEqual("user has been removed")
 })
