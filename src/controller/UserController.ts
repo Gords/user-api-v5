@@ -71,6 +71,7 @@ export class UserController {
 
         if (!isMatch) {
             throw Error("Invalid email or password")
+            
         }
 
         return user;
