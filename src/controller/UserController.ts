@@ -37,27 +37,27 @@ export class UserController {
         return this.userRepository.save(user)
     }
 
-    async update(request: Request, response: Response, next: NextFunction) {
-        const id = request.params.id;
-        const { name, email, password } = request.body;
-    
-        let userToUpdate = await this.userRepository.findOne({
-            where: { id }
-        });
-    
-        if (!userToUpdate) {
-            throw Error("user does not exist");
-        }
-    
-        // Only update provided fields
-        if (name !== undefined) userToUpdate.name = name;
-        if (email !== undefined) userToUpdate.email = email;
-        if (password !== undefined) userToUpdate.password = password;
-    
-        await this.userRepository.save(userToUpdate);
-    
-        return userToUpdate;
+async update(request: Request, response: Response, next: NextFunction) {
+    const id = request.params.id;
+    const { name, email, password } = request.body;
+
+    let userToUpdate = await this.userRepository.findOne({
+        where: { id }
+    });
+
+    if (!userToUpdate) {
+        throw Error("user does not exist");
     }
+
+    // Only update provided fields
+    if (name !== undefined) userToUpdate.name = name;
+    if (email !== undefined) userToUpdate.email = email;
+    if (password !== undefined) userToUpdate.password = password;
+
+    await this.userRepository.save(userToUpdate);
+
+    return userToUpdate;
+}
 
     async login(request: Request, response: Response, next: NextFunction) {
         const { email, password } = request.body
