@@ -1,6 +1,7 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
 import { User } from "../entity/User"
+import { sign } from 'jsonwebtoken'
 
 
 export class UserController {
@@ -71,10 +72,19 @@ export class UserController {
 
         if (!isMatch) {
             throw Error("Invalid email or password")
-            
         }
 
-        return user;
+        // Generate a JWT token
+        const accessToken = sign(
+            { userId: user.id, email: user.email }, // Payload
+            process.env.ACCESS_TOKEN_SECRET,        // Secret key
+            { expiresIn: '1h' }                     // Token expiration
+        );
+
+        user.tokens.push(accessToken);
+        await this.userRepository.save(user);
+
+        return { accessToken, user: { id: user.id, name: user.name, email: user.email } };
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
