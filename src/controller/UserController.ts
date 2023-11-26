@@ -5,7 +5,6 @@ import { sign } from 'jsonwebtoken'
 
 
 export class UserController {
-
     private userRepository = AppDataSource.getRepository(User)
 
     async all(request: Request, response: Response, next: NextFunction) {
@@ -22,6 +21,7 @@ export class UserController {
         if (!user) {
             return "unregistered user"
         }
+
         return user
     }
 
@@ -38,24 +38,25 @@ export class UserController {
     }
 
     async update(request: Request, response: Response, next: NextFunction) {
-        const id = request.params.id
-        const { name, email, password } = request.body
-
+        const id = request.params.id;
+        const { name, email, password } = request.body;
+    
         let userToUpdate = await this.userRepository.findOne({
             where: { id }
-        })
-
+        });
+    
         if (!userToUpdate) {
-            throw Error("user does not exist")
+            throw Error("user does not exist");
         }
-
-        userToUpdate.name = name
-        userToUpdate.email = email
-        userToUpdate.password = password
-
-        await this.userRepository.save(userToUpdate)
-
-        return userToUpdate
+    
+        // Only update provided fields
+        if (name !== undefined) userToUpdate.name = name;
+        if (email !== undefined) userToUpdate.email = email;
+        if (password !== undefined) userToUpdate.password = password;
+    
+        await this.userRepository.save(userToUpdate);
+    
+        return userToUpdate;
     }
 
     async login(request: Request, response: Response, next: NextFunction) {
@@ -68,6 +69,7 @@ export class UserController {
         if (!user) {
             throw Error("Invalid email or password")
         }
+
         const isMatch = await User.comparePasswords(password, user.password)
 
         if (!isMatch) {

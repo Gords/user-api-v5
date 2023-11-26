@@ -10,12 +10,10 @@ const handleError = (error: Error, req: Request, res: Response, next: Function) 
     res.status(500).send({ message: error.message })
 }
 
-// create express app
 const app = express()
 app.use(morgan('tiny'))
 app.use(bodyParser.json())
 
-// register express routes from defined application routes
 Routes.forEach(route => {
     const middlewares = route.middleware ? [...route.middleware, ...route.validation] : route.validation;
 

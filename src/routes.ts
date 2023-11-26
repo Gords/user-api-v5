@@ -9,7 +9,8 @@ export const Routes = [{
     action: "all",
     validation: [],
     middleware: [authenticateToken]
-}, {
+}, 
+{
     method: "get",
     route: "/users/:id",
     controller: UserController,
@@ -18,7 +19,8 @@ export const Routes = [{
         param('id').isUUID(),
     ],
     middleware: [authenticateToken]
-}, {
+}, 
+{
     method: "post",
     route: "/users",
     controller: UserController,
@@ -47,10 +49,9 @@ export const Routes = [{
     controller: UserController,
     action: "update",
     validation: [
-        body('name').isString(),
-        body('email').isString(),
-        body('email').isEmail(),
-        body('password').isString().isLength({min: 4}),
+        body('name').optional().isString(),
+        body('email').optional().isString().isEmail(),
+        body('password').optional().isString().isLength({min: 4}),
     ],
     middleware: [authenticateToken]
 },
@@ -60,10 +61,9 @@ export const Routes = [{
     controller: UserController,
     action: "update",
     validation: [
-        body('name').isString(),
-        body('email').isString(),
-        body('email').isEmail(),
-        body('password').isString().isLength({min: 4}),
+        body('name').optional().isString(),
+        body('email').optional().isString().isEmail(),
+        body('password').optional().isString().isLength({min: 4}),
     ],
     middleware: [authenticateToken]
 },
