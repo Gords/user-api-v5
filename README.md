@@ -68,6 +68,7 @@ Remove a user from the system (needs the JWT token to be send as a Bearer Token)
 - **Nodemon**: For automatic server restarts during development.
 - **Docker**: For containerization and deployment of the database.
 - **Bcrypt**: For secure password hashing and storage.
+- **Dotenv**: For managing environment variables.
 
 ## Testing
 
